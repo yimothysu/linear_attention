@@ -57,7 +57,7 @@ class MultiHeadAttention(nn.Module):
 
         attention_unnormalized: torch.Tensor = q @ k.transpose(-2, -1) / self.d_k**0.5
         if self.is_masked:
-            attention_unnormalized.masked_fill_(self.mask, float("-inf"))
+            attention_unnormalized.masked_fill_(self.mask[:l, :l] == 0, float("-inf"))
         attention = self.softmax_fn(attention_unnormalized)
         out = (attention @ v).view(N, l, -1)
         out = self.fc_out(out)
